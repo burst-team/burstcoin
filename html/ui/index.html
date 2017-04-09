@@ -13,209 +13,16 @@
         <link href="css/app.css" rel="stylesheet" type="text/css" />
         <link href="css/atcrowdfund-style.css" rel="stylesheet" type="text/css"  />
         <link href="css/tab-style.css" rel="stylesheet" type="text/css" />
+        <link href="css/index.css" rel="stylesheet" type="text/css" />
         <style id="user_header_style" type="text/css"></style>
         <style id="user_sidebar_style" type="text/css"></style>
         <style id="user_boxes_style" type="text/css"></style>
         <!-- Reconsider this jquery input as its a multiple of the one in 3rd party folder, one posibility might be to add jquery here but remove from 3rd party
             same with the import i removed for bootstrap.js. Duplicate imports for scripts might cause some spectacular and hard to trace bugs -->
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
-        <style>
-            .animate-change {
-    		background-color:green;
-    		}
-    		#at td {
-    		background-color:#E5E6EB;
-    		}
-    		.footer {
-    		position:absolute;
-    		bottom:0;
-    		width:100%;
-    		height:60px;
-    		background-color:#f5f5f5;
-    		}
-    		#wrapper {
-    		padding-left:0;
-    		-webkit-transition:all 0.5s ease;
-    		-moz-transition:all 0.5s ease;
-    		-o-transition:all 0.5s ease;
-    		transition:all 0.5s ease;
-    		}
-    		
-    		#wrapper.toggled {
-    		padding-left:200px;
-    		}
-    		
-    		#sidebar-wrapper {
-    		z-index:1000;
-    		position:fixed;
-    		left:200px;
-    		width:0;
-    		height:100%;
-    		margin-left:-200px;
-    		overflow-y:auto;
-    		background:#282C2F;
-    		-webkit-transition:all 0.5s ease;
-    		-moz-transition:all 0.5s ease;
-    		-o-transition:all 0.5s ease;
-    		transition:all 0.5s ease;
-    		}
-    		
-    		#wrapper.toggled #sidebar-wrapper {
-    		width:200px;
-    		}
-    		
-    		#page-content-wrapper {
-    		width:100%;
-    		position:absolute;
-    		padding:15px;
-    		}
-    		
-    		#wrapper.toggled #page-content-wrapper {
-    		position:absolute;
-    		margin-right:-200px;
-    		}
-    		/* Sidebar Styles */
-    		.sidebar-nav {
-    		position:absolute;
-    		top:0;
-    		width:200px;
-    		margin:0;
-    		padding:0;
-    		list-style:none;
-    		}
-    		
-    		.sidebar-nav li {
-    		text-indent:20px;
-    		line-height:40px;
-    		}
-    		
-    		.sidebar-nav li a {
-    		display:block;
-    		text-decoration:none;
-    		color:#999999;
-    		}
-    		.crowd{margin-bottom: 10px;}
-    		
-    		.sidebar-nav li a:hover {
-    		text-decoration:none;
-    		color:#fff;
-    		background:#69C784;
-    		}
-    		
-    		.sidebar-nav li a:active,.sidebar-nav li a:focus {
-    		text-decoration:none;
-    		}
-    		
-    		.sidebar-nav >.sidebar-brand {
-    		height:65px;
-    		font-size:18px;
-    		line-height:60px;
-    		}
-    		
-    		.sidebar-nav >.sidebar-brand a {
-    		color:#999999;
-    		}
-    		
-    		.sidebar-nav >.sidebar-brand a:hover {
-    		color:#fff;
-    		background:none;
-    		}
-    		
-    		#powered-by {
-    		bottom:0;
-    		}
-    		
-    		@media(min-width:768px) {
-    		#wrapper {
-    		padding-left:200px;
-    		}
-    		
-    		#wrapper.toggled {
-    		padding-left:0;
-    		}
-    		
-    		#sidebar-wrapper {
-    		width:200px;
-    		}
-    		
-    		#wrapper.toggled #sidebar-wrapper {
-    		width:0;
-    		}
-    		
-    		#page-content-wrapper {
-    		padding:20px;
-    		position:relative;
-    		}
-    		
-    		#wrapper.toggled #page-content-wrapper {
-    		position:relative;
-    		margin-right:0;
-    		}
-    		}
-    		
-    		#page-content-wrapper .crowd {
-    		margin-top:20px;
-    		}
-    		
-    		.progress {
-    		position:relative;
-    		height:40px;
-    		}
-    		
-    		.progress {
-    		margin-bottom:10px;
-    		}
-    		
-    		.progress-value {
-    		position:absolute;
-    		right:0;
-    		left:0;
-    		color:white;
-    		font-size:1em;
-    		line-height:40px;
-    		}
-    		.crowdbox {
-    		padding:10px 5%;
-    		background-color: #fff !important;
-    		border:1px solid lightgray;
-    		max-height:550px;
-    		min-height:550px;
-    		}
-    		
-    		.crowdtext {
-    		font-size:1.2em;
-    		max-height:240px;
-    		min-height:240px;
-    		overflow:auto;
-    		}
-    		
-    		.text-amount {
-    		}
-    		
-    		.crowdbox h2,hr {
-    		margin-top:10px;
-    		margin-bottom:10px;
-    		font-size: 20px;
-    		}
-    		
-    		.text-amount {
-    		}
-    		
-    		.ends-in {
-    		height:40px;
-    		line-height:40px;
-    		}
-    		
-    		.open-buyTicket {
-    		font-size:1.2em;
-    		}
-
-            .show-my-trades-only {
-            float: right;
-            margin: 0.5em 0.5em;
-            }
-        </style>
-        <!--script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js" type="text/javascript"></script-->
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>        
+        <!--
+        <script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js" type="text/javascript"></script>
+        -->
     </head>
     <body class="lockscreen fixed">
         <div id="lockscreen">
@@ -232,11 +39,11 @@
                         </ul>
                     </div>
                 </div>
-                -->
+            -->
             <table id="center" style="display:none;width:100%;height:100%;">
                 <tr>
                     <td style="text-align:center;vertical-align:middle">
-                        <center><img src="img/nxt_logo.png" alt="Nxt" width="320" height="88" style="margin-bottom:40px;opacity: 0.5;;" /></center>
+                        <center><img src="img/Burst_logo.png" alt="Nxt" width="320" height="88" style="margin-bottom:40px;opacity: 0.5;;" /></center>
                         <div id="login_panel">
                             <div class="callout callout-danger" id="testnet_login" style="max-width:400px;min-width:400px;display:none;" data-i18n="[html]testnet_login_warning">Log in with your <strong>TestNet</strong> account - not your real one!</div>
                             <div id="login_error" style="max-width:400px;min-width:400px;display:none">
@@ -343,7 +150,7 @@
         </div>
         <header class="header">
             <a href="#" class="logo" id="logo" data-page="dashboard">
-            <img src="img/nxt_logo_small.png" style="opacity:0.95" />
+            <img src="img/burst_logo_small.png" style="opacity:0.95" />
             </a>
             <nav class="navbar navbar-static-top" role="navigation">
                 <div class="navbar-right">
@@ -353,25 +160,21 @@
                         <li class="dropdown"><a href="#" data-toggle="modal" data-target="#send_message_modal" data-i18n="send_message"> Send Message</a></li>
                         <li class="dropdown show-dropdown-settings">
                         <script>
-						 $(document).ready(function()
-						 {
-							 
-							 $(".show-dropdown-settings").click(function()
-							 {
+						 $(document).ready(function() {							 
+							 $(".show-dropdown-settings").click(function() {
 								 $(".dropdown-menu-settings").toggle();
 								 $(".dropdown-menu-website").hide();
 							 });
 							 
-							 $("#page").click(function(event ){
+							 $("#page").click(function(event ) {
 								$("body").find(".dropdown-menu-settings").hide();
 								
 							});
 							 
-							 $(".left-side").click(function(event ){
+							 $(".left-side").click(function(event ) {
 								$("body").find(".dropdown-menu-settings").hide();
 								
-							});
-							 
+							});							 
 							 
 						 });
 						</script>
@@ -387,14 +190,12 @@
                         </li>
                         <li class="dropdown show-dropdown-website">
                          <script>
-						 $(document).ready(function()
-						 {
+						 $(document).ready(function() {
 							 $(".show-dropdown-website").click(function()
 							 {
 								 $(".dropdown-menu-website").toggle();
 								  $(".dropdown-menu-settings").hide();
-							 });
-							 
+							 });							 
 							 
 							  $("#page").click(function(event ){
 								$("body").find(".dropdown-menu-website").hide();
@@ -6071,11 +5872,9 @@
         <script src="js/nrs.modals.subscription.js" type="text/javascript"></script>
         <script src="js/nrs.at.js" type="text/javascript"></script>
         <script src="js/nrs.crowdfunding.js" type="text/javascript"></script>
-	<script src="js/nsv.dividends.js" type="text/javascript"></script>   <!--additional Dividends+ code-->
-	<script src="js/nsv.voting.js" type="text/javascript"></script>   <!--additional Dividends+ code-->
+	    <script src="js/nsv.dividends.js" type="text/javascript"></script>  <!--additional Dividends+ code-->
+	    <script src="js/nsv.voting.js" type="text/javascript"></script>     <!--additional Dividends+ code-->
     </body>
     <!--atcrowdfund script-->
-    <script type="text/javascript">
-        
-    </script>
+    <script type="text/javascript"></script>
 </html>
