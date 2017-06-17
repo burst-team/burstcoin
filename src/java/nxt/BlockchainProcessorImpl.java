@@ -15,6 +15,7 @@ import nxt.util.Listener;
 import nxt.util.Listeners;
 import nxt.util.Logger;
 import nxt.util.ThreadPool;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -39,6 +40,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
@@ -75,6 +78,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 	private volatile boolean isScanning;
 	private volatile boolean forceScan = Nxt.getBooleanProperty("nxt.forceScan");
 	private volatile boolean validateAtScan = Nxt.getBooleanProperty("nxt.forceValidate");
+	
+	private final ConcurrentMap<Long, SortedSet<TransactionImpl>> computedBlockTransactions = new ConcurrentHashMap<Long, SortedSet<TransactionImpl>>();
 
 	// Last downloaded block:
 	private Long lastDownloaded = 0L;
@@ -943,6 +948,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 				block.setPrevious(previousLastBlock);
 				blockListeners.notify(block, Event.BEFORE_BLOCK_ACCEPT);
 				transactionProcessor.requeueAllUnconfirmedTransactions();
+				computedBlockTransactions.clear();
 				Account.flushAccountTable();
 				addBlock(block);
 				accept(block, remainingAmount, remainingFee);
@@ -1069,9 +1075,13 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 				: previousBlockHeight < Constants.NQT_BLOCK ? 2
 						: 3;
 	}
-
-	void generateBlock(String secretPhrase, byte[] publicKey, Long nonce) throws BlockNotAcceptedException {
-
+	
+	public SortedSet<TransactionImpl> getBlockTransactions(Block previousBlock) {
+		SortedSet<TransactionImpl> previouslyComputedBlockedTransactions = computedBlockTransactions.get(previousBlock.getId());
+		if (previouslyComputedBlockedTransactions != null) {
+			return previouslyComputedBlockedTransactions;
+		}
+		
 		TransactionProcessorImpl transactionProcessor = TransactionProcessorImpl.getInstance();
 		List<TransactionImpl> orderedUnconfirmedTransactions = new ArrayList<>();
 		try (FilteringIterator<TransactionImpl> transactions = new FilteringIterator<>(transactionProcessor.getAllUnconfirmedTransactions(),
@@ -1085,15 +1095,11 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 				orderedUnconfirmedTransactions.add(transaction);
 			}
 		}
-
-		BlockImpl previousBlock = blockchain.getLastBlock();
-
+		
 		SortedSet<TransactionImpl> blockTransactions = new TreeSet<>();
 
 		Map<TransactionType, Set<String>> duplicates = new HashMap<>();
 
-		long totalAmountNQT = 0;
-		long totalFeeNQT = 0;
 		int payloadLength = 0;
 
 		int blockTimestamp = Nxt.getEpochTime();
@@ -1144,8 +1150,6 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 
 				 blockTransactions.add(transaction);
 				 payloadLength += transactionLength;
-				 totalAmountNQT += transaction.getAmountNQT();
-				 totalFeeNQT += transaction.getFeeNQT();
 
 			}
 
@@ -1153,7 +1157,42 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 				break;
 			}
 		}
+		
+		computedBlockTransactions.putIfAbsent(previousBlock.getId(), blockTransactions);
+		return blockTransactions;
+	}
+	
+	@Override
+	public byte[] getTransactionHash(Block previousBlock) {
+		SortedSet<TransactionImpl> transactions = BlockchainProcessorImpl.getInstance().getBlockTransactions(previousBlock);
+		MessageDigest digest = Crypto.sha256();
+		
+		for (Transaction transaction : transactions) {
+			digest.update(transaction.getBytes());
+		}
 
+		return digest.digest();
+	}
+
+	void generateBlock(String secretPhrase, byte[] publicKey, Long nonce) throws BlockNotAcceptedException {
+		BlockImpl previousBlock = blockchain.getLastBlock();
+
+		SortedSet<TransactionImpl> blockTransactions = getBlockTransactions(previousBlock);
+		byte[] payloadHash = getTransactionHash(previousBlock);
+
+		long totalAmountNQT = 0;
+		long totalFeeNQT = 0;
+		int payloadLength = 0;
+
+		int blockTimestamp = Nxt.getEpochTime();
+
+		for (TransactionImpl transaction : blockTransactions) {
+			payloadLength += transaction.getSize();
+			totalAmountNQT += transaction.getAmountNQT();
+			totalFeeNQT += transaction.getFeeNQT();
+		}
+		
+		TransactionProcessorImpl transactionProcessor = TransactionProcessorImpl.getInstance();
 		if(Subscription.isEnabled()) {
 			synchronized(blockchain) {
 				Subscription.clearRemovals();
@@ -1192,15 +1231,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 
 		//ATs for block
 
-		MessageDigest digest = Crypto.sha256();
-		
-		for (Transaction transaction : blockTransactions) {
-			digest.update(transaction.getBytes());
-		}
-
-		byte[] payloadHash = digest.digest();
-
-		byte[] generationSignature = Nxt.getGenerator().calculateGenerationSignature(previousBlock.getGenerationSignature(), previousBlock.getGeneratorId());
+		byte[] generationSignature = Nxt.getGenerator().calculateGenerationSignature(previousBlock.getGenerationSignature(), previousBlock.getGeneratorId(), payloadHash, previousBlock.getHeight() + 1);
 
 		BlockImpl block;
 		byte[] previousBlockHash = Crypto.sha256().digest(previousBlock.getBytes());
