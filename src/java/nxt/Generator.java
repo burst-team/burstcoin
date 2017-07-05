@@ -18,7 +18,7 @@ public interface Generator {
     GeneratorState addNonce(String secretPhrase, Long nonce, byte[] publicKey);
     Collection<? extends GeneratorState> getAllGenerators();
 
-    byte[] calculateGenerationSignature(byte[] lastGenSig, long lastGenId);
+    byte[] calculateGenerationSignature(byte[] lastGenSig, long lastGenId, byte[] transactionHash, long blockHeight);
     int calculateScoop(byte[] genSig, long height);
     BigInteger calculateHit(long accountId, long nonce, byte[] genSig, int scoop);
     BigInteger calculateHit(long accountId, long nonce, byte[] genSig, byte[] scoopData);
@@ -30,4 +30,5 @@ public interface Generator {
         BigInteger getDeadline();
         long getBlock();
     }
+
 }

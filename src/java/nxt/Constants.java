@@ -91,6 +91,8 @@ public final class Constants {
 	public static final int AT_FIX_BLOCK_2 = 67000;
 	public static final int AT_FIX_BLOCK_3 = 92000;
     public static final int AT_FIX_BLOCK_4 = 255000;
+    
+    public static final int TRANSACTION_HASH_IN_GENERATION_SIG_BLOCK = 376600;
 
     public static final int[] MIN_VERSION = new int[] {1, 2};
     

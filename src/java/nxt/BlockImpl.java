@@ -424,7 +424,7 @@ final class BlockImpl implements Block {
 			preVerify();
 	    }
 
-	    byte[] correctGenerationSignature = Nxt.getGenerator().calculateGenerationSignature(previousBlock.getGenerationSignature(), previousBlock.getGeneratorId());
+	    byte[] correctGenerationSignature = Nxt.getGenerator().calculateGenerationSignature(previousBlock.getGenerationSignature(), previousBlock.getGeneratorId(), getPayloadHash(), getHeight());
 	    if(!Arrays.equals(generationSignature, correctGenerationSignature)) {
 		return false;
 	    }

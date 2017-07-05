@@ -10,10 +10,12 @@ import nxt.util.MiningPlot;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.security.MessageDigest;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.SortedSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -129,11 +131,19 @@ public final class GeneratorImpl implements Generator {
     }
 
     @Override
-    public byte[] calculateGenerationSignature(byte[] lastGenSig, long lastGenId) {
-        ByteBuffer gensigbuf = ByteBuffer.allocate(32 + 8);
-        gensigbuf.put(lastGenSig);
-        gensigbuf.putLong(lastGenId);
-
+    public byte[] calculateGenerationSignature(byte[] lastGenSig, long lastGenId, byte[] transactionHash, long blockHeight) {
+		ByteBuffer gensigbuf;
+		if (blockHeight >= Constants.TRANSACTION_HASH_IN_GENERATION_SIG_BLOCK) {
+			gensigbuf = ByteBuffer.allocate(32 + 8 + 32);
+			gensigbuf.put(lastGenSig);
+			gensigbuf.putLong(lastGenId);
+			gensigbuf.put(transactionHash);
+		} else {
+			gensigbuf = ByteBuffer.allocate(32 + 8);
+			gensigbuf.put(lastGenSig);
+			gensigbuf.putLong(lastGenId);
+		}
+        
         Shabal256 md = new Shabal256();
         md.update(gensigbuf.array());
         return md.digest();
@@ -197,8 +207,9 @@ public final class GeneratorImpl implements Generator {
             Block lastBlock = Nxt.getBlockchain().getLastBlock();
             byte[] lastGenSig = lastBlock.getGenerationSignature();
             Long lastGenerator = lastBlock.getGeneratorId();
+            byte[] transactionHash = Nxt.getBlockchainProcessor().getTransactionHash(lastBlock);
 
-            byte[] newGenSig = calculateGenerationSignature(lastGenSig, lastGenerator);
+            byte[] newGenSig = calculateGenerationSignature(lastGenSig, lastGenerator, transactionHash, block);
 
             int scoopNum = calculateScoop(newGenSig, lastBlock.getHeight() + 1);
 
@@ -278,7 +289,7 @@ public final class GeneratorImpl implements Generator {
         }
 
         @Override
-        public byte[] calculateGenerationSignature(byte[] lastGenSig, long lastGenId) {
+        public byte[] calculateGenerationSignature(byte[] lastGenSig, long lastGenId, byte[] transactionHash, long blockHeight) {
             return new byte[32];
         }
 

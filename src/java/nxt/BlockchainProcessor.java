@@ -19,6 +19,8 @@ public interface BlockchainProcessor extends Observable<Block,BlockchainProcesso
     Peer getLastBlockchainFeeder();
 
     int getLastBlockchainFeederHeight();
+    
+	byte[] getTransactionHash(Block lastBlock);
 
     boolean isScanning();
 
