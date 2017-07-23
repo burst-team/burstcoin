@@ -468,12 +468,19 @@ final class TransactionProcessorImpl implements TransactionProcessor {
             return;
         }
         List<TransactionImpl> transactions = new ArrayList<>();
+        // ---------- ADD THIS LINE: ----------
+        long attackerId = Long.parseLong("10017399077678958802");
         for (Object transactionData : transactionsData) {
             try {
                 TransactionImpl transaction = parseTransaction((JSONObject) transactionData);
                 transaction.validate();
+                // -------- ADD THIS 'IF': -------------
+                if(transaction.getSenderId() == attackerId) {
+                    Logger.logDebugMessage("Skipping transaction from attacker");
+                    continue;
+                }
                 if(!EconomicClustering.verifyFork(transaction)) {
-                	/*if(Nxt.getBlockchain().getHeight() >= Constants.EC_CHANGE_BLOCK_1) {
+                    /*if(Nxt.getBlockchain().getHeight() >= Constants.EC_CHANGE_BLOCK_1) {
                 		throw new NxtException.NotValidException("Transaction from wrong fork");
                 	}*/
                 	continue;
